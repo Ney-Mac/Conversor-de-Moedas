@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { theme } from './src/themes/theme';
@@ -11,24 +11,12 @@ import ResponseArea from './src/components/ResponseArea';
 import Button from './src/components/Button';
 
 export default function App() {
-    const [fromValue, setFromValue] = useState({ index: '', text: '' });
-    const [toValue, setToValue] = useState({ index: '', text: '' });
-    const [value, setValue] = useState({ val: '', error: '' });
+    const [moedaOrigem, setMoedaOrigem] = useState({ value: '', sms: '', error: '' });
+    const [moedaDestino, setMoedaDestino] = useState({ value: '', sms: '', error: '' });
+    const [valueToConvert, setValueToConvert] = useState({ value: '', error: '' });
     const [result, setResult] = useState(null);
 
-    const convert = (from, to, value) => {
-        console.log(from, to, value);
-
-        if(!value) {
-            setValue({ ...value, error: 'Digite um valor válido' });
-            return;
-        }
-
-        if(from === null || to === null) {
-            setValue({ ...value, error: 'Escolha a moeda' });
-            return;
-        }
-
+    const converter = (from, to, value) => {
         if(from === 0 && to === 1){//kz-dl
             setResult(value * 0.0012);
         } else if(from === 0 && to === 2){//kz-eur
@@ -44,18 +32,24 @@ export default function App() {
         }else setResult(value * 1);
     }
 
-    const selectFrom = (selectedItem, index) => {
-        setFromValue({ index: index, text: selectedItem });
-        setResult(null);
-    }
-
-    const selectTo = (selectedItem, index) => {
-        setToValue({ index: index, text: selectedItem });
+    const handleMoeda = (setDropdown, selectedItem, index) => {
+        setDropdown({ value: index, sms: selectedItem, error: '' });
         setResult(null);
     }
 
     const onPress = () => {
-        convert(fromValue.index, toValue.index, value.val);
+        const moedaOrigemErro = (!moedaOrigem.sms)? 'Escolha a moeda' : '';
+        const moedaDestinoErro = (!moedaDestino.sms)? 'Escolha a moeda' : '';
+        const valueToConvertErro = (!valueToConvert.value)? 'Digite um valor válido' : '';
+
+        if(moedaOrigemErro || moedaDestinoErro || valueToConvertErro) {
+            setMoedaOrigem({ ...moedaOrigem, error: moedaOrigemErro });
+            setMoedaDestino({ ...moedaDestino, error: moedaDestinoErro });
+            setValueToConvert({ ...valueToConvert, error: valueToConvertErro });
+            return;
+        }
+
+        converter(moedaOrigem.value, moedaDestino.value, valueToConvert.value);
     }
 
     return (
@@ -65,29 +59,34 @@ export default function App() {
             <MainContainer>
                 <TextInput
                     headerText="Valor"
-                    value={value.val}
+                    value={valueToConvert.value}
                     keyboardType="numeric"
-                    affixindex={fromValue.index}
                     onChangeText={(text) => {
-                        setValue({ val: text, error: '' });
+                        setValueToConvert({ value: text, error: '' });
                         setResult(null);
                     }}
-                    errorText={value.error}
+                    errorText={valueToConvert.error}
                 />
                 <Dropdown
                     headerText="De"
-                    onSelect={selectFrom}
+                    onSelect={(selectedItem, index) => { 
+                        handleMoeda(setMoedaOrigem, selectedItem, index);
+                    }}
+                    errorText={moedaOrigem.error}
                 />
                 <Dropdown
                     headerText="Para"
-                    onSelect={selectTo}
+                    onSelect={(selectedItem, index) => { 
+                        handleMoeda(setMoedaDestino, selectedItem, index); 
+                    }}
+                    errorText={moedaDestino.error}
                 />
                 <Button onPress={onPress} >Converter</Button>
                 <ResponseArea
-                    fromText={fromValue.text}
-                    valorIn={value.val}
+                    fromText={moedaOrigem.sms}
+                    resultText={moedaDestino.sms}
+                    valorIn={valueToConvert.value}
                     result={result}
-                    resultText={toValue.text}
                 />
 
             </MainContainer>

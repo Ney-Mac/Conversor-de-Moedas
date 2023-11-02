@@ -2,14 +2,14 @@ import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import SelectDropdown from "react-native-select-dropdown";
 import { Icon } from 'react-native-paper';
+import { theme } from '../themes/theme';
 
 const data = ['Kwanza angolano', 'Dólar americano', 'Euro europeu'];
 
-export default function Dropdown({ headerText = "Texto", onSelect, ...props }) {
+export default function Dropdown({ headerText, onSelect, errorText, ...props }) {
     return (
         <View style={styles.container}>
             <Text variant="headlineSmall" >{headerText}</Text>
-
             <SelectDropdown
                 buttonStyle={styles.select}
                 defaultButtonText='Escolha uma opção'
@@ -22,6 +22,14 @@ export default function Dropdown({ headerText = "Texto", onSelect, ...props }) {
                 )}
                 {...props}
             />
+            {errorText && (
+                <Text 
+                    variant="labelLarge"
+                    style={{ color: theme.colors.error }}
+                >
+                    {errorText}
+                </Text>
+            )}
         </View>
     );
 }
@@ -34,6 +42,5 @@ const styles = StyleSheet.create({
     },
     select: {
         width: '100%',
-
     }
 });

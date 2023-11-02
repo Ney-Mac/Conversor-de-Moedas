@@ -3,14 +3,14 @@ import { Text } from "react-native-paper";
 
 export default function ResponseArea({ fromText, valorIn, result, resultText }) {
     return (
-        <>{result && (
-            <View style={styles.container}>
-                <Text>{valorIn} {fromText} = </Text>
-                <Text variant="displayMedium">{result} {resultText}</Text>
-            </View>
-        )
-
-        }</>
+        <>
+            {result && (
+                <View style={styles.container}>
+                    <Text>{valorIn} {fromText} = </Text>
+                    <Text variant="displayMedium">{result} {resultText}</Text>
+                </View>
+            )}
+        </>
     );
 }
 
